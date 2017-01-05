@@ -48,6 +48,20 @@ int main(int argc, char *argv[])
     bool player2_alive = true;
     Mat player2 = imread("player2.png", IMREAD_UNCHANGED);
 
+    if ( capture.read(frame) ) {
+        if( frame.empty() ) {
+            printf(" --(!) No captured frame -- Break!");
+            return -1;
+        }
+        Mat startSceneBg;
+        bg.copyTo(startSceneBg);
+        Mat startScene = startSceneBg(Rect(0,bgy-720-1,frame.cols,720));
+        putText(startScene, "Move you face left and right!", Point(120,360), FONT_HERSHEY_DUPLEX , 0.8, Scalar(0,0,255));
+
+        imshow("Scene", startScene);
+        waitKey(3000);
+    }
+
     while ( capture.read(frame) ) {
         if( frame.empty() ) {
             printf(" --(!) No captured frame -- Break!");
