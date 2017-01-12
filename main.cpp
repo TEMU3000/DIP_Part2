@@ -88,7 +88,6 @@ int main(int argc, char *argv[])
         overlayImage((player2_alive) ? new_scene : scene, player, new_scene,Point(player_x_screen, 740 - player.rows));
 
         if(!has_met){
-            //srand(time(NULL));
             //metx = (rand()%3 * 230 + 30); // 3-way
             metx = (rand()%(frame.cols-120)); // random
             overlayImage(new_scene, met, new_scene,Point(metx,-108));
@@ -155,9 +154,8 @@ int main(int argc, char *argv[])
 
 Mat detectAndMask( Mat frame )
 {
-    std::vector<Rect> faces;
+    vector<Rect> faces;
     Mat frame_gray;
-    //Mat ship = imread("ship.png",IMREAD_UNCHANGED);
     Mat ship_copy;
     ship.copyTo(ship_copy);
 
@@ -175,7 +173,6 @@ Mat detectAndMask( Mat frame )
     player_x = frame.cols - faces[0].x - faces[0].width;
     wide = frame.cols - faces[0].width;
 
-    //Mat mask = imread("mask.jpg",IMREAD_GRAYSCALE);
     Mat re_mask;
 
     resize(mask,re_mask,Size(faceROI.cols,faceROI.rows));
@@ -198,28 +195,20 @@ Mat detectAndMask( Mat frame )
 void overlayImage(const Mat &background, const Mat &foreground, Mat &output, Point2i location){
     background.copyTo(output);
 
-    // start at the row indicated by location, or at row 0 if location.y is negative.
     for(int y = std::max(location.y , 0); y < background.rows; ++y) {
-        int fY = y - location.y; // because of the translation
+        int fY = y - location.y;
 
-        // we are done of we have processed all rows of the foreground image.
         if(fY >= foreground.rows)
             break;
 
-        // start at the column indicated by location,
-        // or at column 0 if location.x is negative.
         for(int x = std::max(location.x, 0); x < background.cols; ++x) {
-            int fX = x - location.x; // because of the translation.
+            int fX = x - location.x;
 
-            // we are done with this row if the column is outside of the foreground image.
             if(fX >= foreground.cols)
                 break;
 
-            // determine the opacity of the foregrond pixel, using its fourth (alpha) channel.
             double opacity = ((double)foreground.data[fY * foreground.step + fX * foreground.channels() + 3]) / 255.;
 
-            // and now combine the background and foreground pixel, using the opacity,
-            // but only if opacity > 0.
             for(int c = 0; opacity > 0 && c < output.channels(); ++c) {
                 unsigned char foregroundPx = foreground.data[fY * foreground.step + fX * foreground.channels() + c];
                 unsigned char backgroundPx = background.data[y * background.step + x * background.channels() + c];
